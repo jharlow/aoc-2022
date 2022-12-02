@@ -6,7 +6,7 @@ const winningMatches = {
   paper: "rock",
 };
 
-const loosingMatches = {
+const losingMatches = {
   rock: "paper",
   scissors: "rock",
   paper: "scissors",
@@ -19,7 +19,7 @@ const roundScoreBasePoints = {
 };
 
 const roundScoreAdditions = {
-  loose: 0,
+  lose: 0,
   draw: 3,
   win: 6,
 };
@@ -42,7 +42,7 @@ const yourSelection = (opponent, you) => {
   const selections = {
     X: winningMatches[opponent],
     Y: opponent,
-    Z: loosingMatches[opponent],
+    Z: losingMatches[opponent],
   };
   return selections[you];
 };
@@ -54,7 +54,7 @@ const inputInvalid = (i) => {
 
 const roundOutcome = (opponent, you) => {
   if (opponent === you) return "draw";
-  if (winningMatches[opponent] === you) return "loose";
+  if (winningMatches[opponent] === you) return "lose";
   if (winningMatches[you] === opponent) return "win";
   else return "error";
 };
