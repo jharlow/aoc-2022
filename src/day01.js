@@ -16,6 +16,7 @@ const day01 = () => {
     })
     .sort((a, b) => (a > b ? -1 : 1));
 
+  // PUZZLE 1 SOLUTION return totalCaloriesSplitByElf[0]
   return totalCaloriesSplitByElf.splice(0, 3).reduce((a, b) => a + b, 0);
 };
 
