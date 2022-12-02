@@ -3,7 +3,6 @@ import fs from "fs";
 const day01 = () => {
   const data = fs.readFileSync("./resources/day01.input.txt", "utf-8");
   const emptyNewLineRegex = /(?:\h*\n){2,}/;
-
   const caloriesSplitByElf = data.split(emptyNewLineRegex);
 
   const totalCaloriesSplitByElf = caloriesSplitByElf
