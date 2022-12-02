@@ -68,10 +68,10 @@ const roundScore = (opponent, you) => {
 };
 
 const day02 = () => {
-  const emptyNewLineRegex = /(?:\h*\n)/;
+  const newLineRegex = /(?:\h*\n)/;
   const answer = fs
     .readFileSync("./resources/day02.input.text", "utf-8")
-    .split(emptyNewLineRegex)
+    .split(newLineRegex)
     .map((round) => round.split(" "))
     .reduce((total, round) => {
       const opponent = opponentSelection[round[0]];
