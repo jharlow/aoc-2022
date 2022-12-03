@@ -1,19 +1,8 @@
 import fs from "fs";
 
 const getItemPriority = (item) => {
-  if (typeof item !== "string" || item.length !== 1)
-    throw new Error("item must be one charachter");
-
   const lowerCase = "abcdefghijklmnopqrstuvwxyz";
   const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-  const itemIsValidChar = () =>
-    lowerCase
-      .concat(upperCase)
-      .split("")
-      .some((char) => char === item);
-  if (itemIsValidChar() === false)
-    throw new Error("item is not a valid charachter");
 
   const itemIsLowerCase = () =>
     lowerCase.split("").some((char) => char === item);
