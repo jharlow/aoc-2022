@@ -16,7 +16,6 @@ const parse = (data) => {
       .map((item) => item.match(/[A-Z]/i)[0])
       .reverse()
   )
-
   instructions = instructions.split(/\n/).map((line) => {
     const info = line
       .split(" ")
@@ -24,7 +23,6 @@ const parse = (data) => {
       .map((n) => Number(n));
     return { move: info[0], from: info[1] - 1, to: info[2] - 1 };
   });
-  console.log(map)
   return { crates: map, instructions };
 };
 
