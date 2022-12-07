@@ -7,8 +7,7 @@ const day06 = (distinct) => {
     if (i <= distinct - 1) return false;
     const marker = data.slice(i - distinct, i);
     const uniques = [...new Set(marker)];
-    if (uniques.length === distinct) return true;
-    else return false;
+    return (uniques.length === distinct)
   });
 };
 
