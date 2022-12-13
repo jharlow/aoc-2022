@@ -1,3 +1,5 @@
+import fs from "fs";
+
 // DO NOT RUN! VERY VERY BAD! BAD JOHN!
 // DO NOT RUN! VERY VERY BAD! BAD JOHN!
 // DO NOT RUN! VERY VERY BAD! BAD JOHN!
@@ -7,6 +9,8 @@ abcryxxl
 accszExk
 acctuvwj
 abdefghi`;
+
+const data = fs.readFileSync("./resources/day12.input.txt", "utf-8")
 
 const parse = (input, all = false) => {
   return input.split(/\n/).map((row) =>
@@ -32,6 +36,7 @@ const day12 = (input) => {
 
   const getVal = ({ x, y }) => {
     if (x < 0 || y < 0) return false;
+    if (x >= data[0].length || y >= data.length) return false;
     return data[y][x];
   };
 
@@ -39,72 +44,69 @@ const day12 = (input) => {
   const goal = getCoordinates("E", dataWithStartGoal);
   let paths = [[start]];
 
-  console.table(dataWithStartGoal);
+  // console.table(dataWithStartGoal);
 
-  const nextSteps = (coordinates, formerCoordinates) => {
-    const currentVal = getVal({ ...coordinates });
-    let formerRelativeToCurr = null;
-    const { x: curX, y: curY } = coordinates;
-    const { x: forX, y: forY } = formerCoordinates || { x: -2, y: -2 };
-    if (forY + 1 === curY) formerRelativeToCurr = "up";
-    if (forY - 1 === curY) formerRelativeToCurr = "down";
-    if (forX + 1 === curX) formerRelativeToCurr = "left";
-    if (forX - 1 === curX) formerRelativeToCurr = "right";
+  const nextSteps = (path) => {
+    const currentStep = path[path.length - 1]
+    const currentVal = getVal(currentStep);
+    const { x: curX, y: curY } = currentStep;
     const isValidOption = ({ x, y }) => {
       if (x < 0 || y < 0) return false;
-      if (x >= data[0].length || y >= data.length) return false
+      if (x >= data[0].length || y >= data.length) return false;
+      if (
+        path.some(
+          (coord, i) => i !== path.length - 1 && coord.x === x && coord.y === y
+        )
+      )
+        return false;
       if (getVal({ x, y }) > currentVal + 1) return false;
       return { x, y };
     };
     return {
-      up:
-        formerRelativeToCurr === "up"
-          ? false
-          : isValidOption({ x: curX, y: curY - 1 }),
-      down:
-        formerRelativeToCurr === "down"
-          ? false
-          : isValidOption({ x: curX, y: curY + 1 }),
-      left:
-        formerRelativeToCurr === "left"
-          ? false
-          : isValidOption({ x: curX - 1, y: curY }),
-      right:
-        formerRelativeToCurr === "right"
-          ? false
-          : isValidOption({ x: curX + 1, y: curY }),
+      up: isValidOption({ x: curX, y: curY - 1 }),
+      down: isValidOption({ x: curX, y: curY + 1 }),
+      left: isValidOption({ x: curX - 1, y: curY }),
+      right: isValidOption({ x: curX + 1, y: curY }),
     };
   };
 
   let stepCounter = 0;
+  let correctPath = null;
   const step = (paths) => {
     const nextStep = paths.flatMap((path) => {
-      const options = nextSteps(path[path.length - 1], path[path.length - 2]);
+      const options = nextSteps(path);
       const filteredOptions = Object.entries(options)
         .map((opt) => opt[1] || false)
         .filter((opt) => opt);
+
       return Array(filteredOptions.length)
         .fill()
         .map((_, i) => {
           const copiedPath = [...path];
-          const option = filteredOptions[i]
-          const optionIsGoal = getVal(option) === 25
+          const option = filteredOptions[i];
+          const optionIsGoal = getVal(option) === 25;
           copiedPath.push(optionIsGoal || option);
           return copiedPath;
         });
     });
 
-    if (nextStep.some((step) => step[step.length - 1] === true)) return paths
-    
+    if (nextStep.some((path) => path[path.length - 1] === true)) {
+      correctPath = nextStep.find((path) => path[path.length - 1] === true);
+      return
+    }
+    if (stepCounter > 100) {
+      return;
+    }
+
     stepCounter++;
-    // console.log(paths)
-    if (stepCounter > 1000) return paths
     step(nextStep);
   };
 
-  console.log(step(paths).length)
+  step(paths);
+  console.log(correctPath)
+  
 
   // DO NOT RUN! VERY VERY BAD! BAD JOHN!
 };
 
-day12(test);
+day12(data);
