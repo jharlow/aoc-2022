@@ -1,8 +1,8 @@
-import fs from "fs";
+// VERY VERY BAD CODE!
+// VERY VERY BAD CODE!
+// VERY VERY BAD CODE! 
 
-// DO NOT RUN! VERY VERY BAD! BAD JOHN!
-// DO NOT RUN! VERY VERY BAD! BAD JOHN!
-// DO NOT RUN! VERY VERY BAD! BAD JOHN!
+import fs from "fs";
 
 const test = `Sabqponm
 abcryxxl
@@ -104,9 +104,6 @@ const day12 = (input) => {
 
   step(paths);
   console.log(correctPath)
-  
-
-  // DO NOT RUN! VERY VERY BAD! BAD JOHN!
 };
 
 day12(data);
