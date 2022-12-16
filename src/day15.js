@@ -43,24 +43,6 @@ class Sensor {
       left: this.position.x - this.manhattanRange,
       right: this.position.x + this.manhattanRange,
     };
-    // // array[x][y]
-    // this.area.coords = Array(this.manhattanRange * 2 + 1)
-    //   .fill()
-    //   .flatMap((_, x, arr) => {
-    //     const rowLength =
-    //       x <= this.manhattanRange ? x * 2 + 1 : (arr.length - x) * 2 - 1;
-    //     return Array(rowLength)
-    //       .fill()
-    //       .map((_, y, arr) => {
-    //         const distanceToFirst =
-    //           this.manhattanRange + 1 - (arr.length / 2 + 0.5);
-    //         return {
-    //           type: "#",
-    //           x: this.area.left + x,
-    //           y: this.area.top + distanceToFirst + y,
-    //         };
-    //       });
-    //   });
   }
   getValue({x, y}) {
     if (x === this.position.x && y === this.position.y) return "S"
@@ -75,67 +57,65 @@ class Sensor {
   }
 }
 
-class Map {
-  constructor(coords) {
-    this.meta = {
-      x: {
-        highest: coords.sort((a, b) => b.x - a.x)[0].x,
-        lowest: coords.sort((a, b) => a.x - b.x)[0].x,
-      },
-      y: {
-        highest: coords.sort((a, b) => b.y - a.y)[0].y,
-        lowest: coords.sort((a, b) => a.y - b.y)[0].y,
-      },
-    };
-    this.meta.height = this.meta.y.highest - this.meta.y.lowest + 1;
-    this.meta.width = this.meta.x.highest - this.meta.x.lowest + 1;
-    this.map = Array(this.meta.width)
-      .fill()
-      .map((_, i) =>
-        Array(this.meta.height)
-          .fill()
-          .map((_) => ".")
-      );
 
-    coords.forEach((coord) => {
-      const curVal = this.getValueFromMap(coord);
-      if (curVal === "." || curVal === "#") this.addItemToMap(coord);
-    });
-  }
-  getValueFromMap({ x, y }) {
-    return this.map[x - this.meta.x.lowest][y - this.meta.y.lowest];
-  }
-  eliminatedBeaconPositionsRow(y) {
-    return this.getRowFromMap(y).filter(val => val === "#").length
-  }
-  getRowFromMap(y) {
-    return this.map.map(row => row[y - this.meta.y.lowest])
-  }
-  addItemToMap({ x, y, type }) {
-    this.map[x - this.meta.x.lowest][y - this.meta.y.lowest] = type;
-  }
-  visualise() {
-    console.table(
-      [...this.map]
-        .map((_, i) => this.map.map((row) => row[i]).join(""))
-        .slice(0, this.meta.height)
-    );
-  }
-}
 
 const data = parse(test);
 
 const day15 = () => {
   const coords = data.flatMap((line) => {
     const [position, beacon] = line;
-    return new Sensor(position, beacon).allCoordinates;
+    return new Sensor(position, beacon);
   });
 
-  // const CaveMap = new Map(coords);
-  // CaveMap.visualise();
-  // console.log(CaveMap.eliminatedBeaconPositionsRow(10))
-
-  
+  coords[0].getValue({x: 2, y: 18})
 };
 
 day15();
+
+// class Map {
+//   constructor(coords) {
+//     this.meta = {
+//       x: {
+//         highest: coords.sort((a, b) => b.x - a.x)[0].x,
+//         lowest: coords.sort((a, b) => a.x - b.x)[0].x,
+//       },
+//       y: {
+//         highest: coords.sort((a, b) => b.y - a.y)[0].y,
+//         lowest: coords.sort((a, b) => a.y - b.y)[0].y,
+//       },
+//     };
+//     this.meta.height = this.meta.y.highest - this.meta.y.lowest + 1;
+//     this.meta.width = this.meta.x.highest - this.meta.x.lowest + 1;
+//     this.map = Array(this.meta.width)
+//       .fill()
+//       .map((_, i) =>
+//         Array(this.meta.height)
+//           .fill()
+//           .map((_) => ".")
+//       );
+
+//     coords.forEach((coord) => {
+//       const curVal = this.getValueFromMap(coord);
+//       if (curVal === "." || curVal === "#") this.addItemToMap(coord);
+//     });
+//   }
+//   getValueFromMap({ x, y }) {
+//     return this.map[x - this.meta.x.lowest][y - this.meta.y.lowest];
+//   }
+//   eliminatedBeaconPositionsRow(y) {
+//     return this.getRowFromMap(y).filter(val => val === "#").length
+//   }
+//   getRowFromMap(y) {
+//     return this.map.map(row => row[y - this.meta.y.lowest])
+//   }
+//   addItemToMap({ x, y, type }) {
+//     this.map[x - this.meta.x.lowest][y - this.meta.y.lowest] = type;
+//   }
+//   visualise() {
+//     console.table(
+//       [...this.map]
+//         .map((_, i) => this.map.map((row) => row[i]).join(""))
+//         .slice(0, this.meta.height)
+//     );
+//   }
+// }
