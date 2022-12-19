@@ -1,6 +1,6 @@
 import fs from "fs";
 
-const input = fs.readFileSync("./resources/day15.input.txt", "utf-8")
+const input = fs.readFileSync("./resources/day15.input.txt", "utf-8");
 
 const test = `Sensor at x=2, y=18: closest beacon is at x=-2, y=15
 Sensor at x=9, y=16: closest beacon is at x=10, y=16
@@ -43,34 +43,139 @@ class Sensor {
       left: this.position.x - this.manhattanRange,
       right: this.position.x + this.manhattanRange,
     };
+    this.area.width = this.area.right - this.area.left;
+    this.area.height = this.area.bottom - this.area.top;
   }
-  getValue({x, y}) {
-    if (x === this.position.x && y === this.position.y) return "S"
-    if (x === this.beacon.x && y === this.beacon.y) return "B"
-    const xDiff = Math.abs(this.position.x, x);
-    const yDiff = Math.abs(this.position.y, y);
-    console.log(xDiff, yDiff)
-
-  }
-  get allCoordinates() {
-    return [this.position].concat([this.beacon]).concat(this.area.coords);
+  getRow({ y }) {
+    const yDiff = Math.abs(this.position.y - y);
+    const xDiff = this.manhattanRange - yDiff;
+    return {
+      start: { x: this.position.x - xDiff, y },
+      end: { x: this.position.x + xDiff, y },
+      sensor: this.position.y === y ? this.position : undefined,
+      beacon: this.beacon.y === y ? this.beacon : undefined,
+    };
   }
 }
 
+const day15 = (part) => {
+  const data = parse(test);
+  if (part === 1) {
+    const row = 2000000;
+    const coords = data
+      .flatMap((line) => {
+        const [position, beacon] = line;
+        return new Sensor(position, beacon).getRow({ y: row });
+      })
+      .filter((v) => v);
 
+    const meta = {
+      sensors: coords.map((val) => val.sensor).filter((v) => v),
+      beacons: coords.map((val) => val.beacon).filter((v) => v),
+      rows: coords.map((val) => [val.start.x, val.end.x]),
+      lowest: coords
+        .flatMap((v) => [v.start.x, v.end.x])
+        .sort((a, b) => a - b)[0],
+      highest: coords
+        .flatMap((v) => [v.start.x, v.end.x])
+        .sort((a, b) => b - a)[0],
+    };
 
-const data = parse(test);
+    return meta.highest - meta.lowest;
+  }
 
-const day15 = () => {
-  const coords = data.flatMap((line) => {
-    const [position, beacon] = line;
-    return new Sensor(position, beacon);
-  });
+  if (part === 2) {
+    const Sensors = data.map(
+      ([position, beacon]) => new Sensor(position, beacon)
+    );
+    const constraints = {
+      x: { lowest: 0, highest: 20 },
+      y: { lowest: 0, highest: 20 },
+    };
 
-  coords[0].getValue({x: 2, y: 18})
+    for (let y = constraints.y.lowest; y <= constraints.y.highest; y++) {
+      console.log(
+        `${y} of ${constraints.y.highest}: ${
+          Math.ceil((y / constraints.y.highest) * 100)
+        }%`
+      );
+
+      const coords = Sensors.map((Sensor) => Sensor.getRow({ y }));
+
+      const meta = {
+        sensors: coords.map((val) => val.sensor).filter((v) => v),
+        beacons: coords.map((val) => val.beacon).filter((v) => v),
+        rows: coords.map((val) => [val.start.x, val.end.x]),
+        lowest: coords
+          .flatMap((v) => [v.start.x, v.end.x])
+          .sort((a, b) => a - b)[0],
+        highest: coords
+          .flatMap((v) => [v.start.x, v.end.x])
+          .sort((a, b) => b - a)[0],
+      };
+
+      const between = (x, min, max) => x > min && x < max ;
+      const noGaps = meta.rows
+        .map(([start, end]) => [
+          start < end ? start : end,
+          start > end ? start : end,
+        ])
+        .sort(([start, end], [nextS, nextE]) => start - nextS)
+        // .every(([s, e], i, arr) => {
+        //   if (s === meta.lowest)
+        //     return arr.some(([oS, oE], oI) => {
+        //       if (i === oI) return false;
+        //       return between(e-1, oS, oE) && between(e+1, oS, oE);
+        //     });
+        //   if (e === meta.highest)
+        //     return arr.some(([oS, oE], oI) => {
+        //       if (i === oI) return false;
+        //       return between(s-1, oS, oE) && between(s+1, oS, oE);
+        //     });
+        //   return (
+        //     arr.some(([oS, oE], oI) => {
+        //       if (i === oI) return false;
+        //       return between(s-1, oS, oE) && between(s+1, oS, oE);
+        //     }) &&
+        //     arr.some(([oS, oE], oI) => {
+        //       if (i === oI) return false;
+        //       return between(e-1, oS, oE) && between(e+1, oS, oE);
+        //     })
+        //   );
+        // });
+      
+      console.log(noGaps)
+      
+      if (true) {
+        const beaconXIndex = Array(meta.highest - meta.lowest)
+          .fill()
+          .map((_, i) => {
+            const xPos = meta.lowest + i;
+            if (xPos < constraints.x.lowest || xPos > constraints.x.highest)
+              return undefined;
+            if (meta.sensors.some((sensor) => sensor.x === xPos)) return "S";
+            if (meta.beacons.some((beacon) => beacon.x === xPos)) return "B";
+            if (meta.rows.some(([start, end]) => xPos >= start && xPos <= end))
+              return "#";
+            else return ".";
+          })
+          .findIndex((val) => val === ".");
+
+        const beacon =
+          beaconXIndex === -1
+            ? undefined
+            : { x: meta.lowest + beaconXIndex, y };
+
+        if (beacon) {
+          const tuningFreq = beacon.x * 4000000 + y;
+          return tuningFreq;
+        }
+      }
+    }
+  }
 };
 
-day15();
+console.log(day15(2));
 
 // class Map {
 //   constructor(coords) {
